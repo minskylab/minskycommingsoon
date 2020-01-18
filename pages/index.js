@@ -19,11 +19,11 @@ const Home = () => {
   const sendPotentialUserRequest = () => {
     if (!validateEmail(email)) {
       setError("Please, introduce a valid email");
+      setStateMachine({ state: "failed" });
       return;
     }
 
     setLoading(true);
-    setStateMachine({ state: "loading" });
     addNewPotentialUser({ email: email })
       .then(r => {
         console.log(r);
@@ -33,11 +33,73 @@ const Home = () => {
         }
       })
       .catch(err => {
+        setError("Probably you're already registered");
         setStateMachine({ state: "failed" });
       })
       .finally(() => setLoading(false));
   };
 
+  const renderState = () => {
+    if (stateMachine.state === "idle") {
+      return (
+        <Flex verticalAlign={"center"} marginTop={2} flexWrap="wrap">
+          <Box marginTop={2} width={[1, 1, 1 / 2]} marginRight={[0, 0, 3]}>
+            <Label htmlFor="email" fontSize={1} mb={1}>
+              Your Email
+            </Label>
+            <Input
+              id="email"
+              name="email"
+              placeholder="jhon@example.com"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              css={{ borderRadius: "8px", backgroundColor: "#F0F0F0", border: "none", padding: "8px" }}
+            />
+          </Box>
+          <Box
+            width={[1, 1, 1 / 3]}
+            marginTop={[2, "auto", "auto"]}
+            display={["flex", "block", "block"]}
+            justifyContent="flex-end"
+          >
+            <Button
+              py={2}
+              backgroundColor={loading || !validateEmail(email) ? "#F0F0F0" : "#FFDE5F"}
+              color={"#1B1B1B"}
+              css={{ borderRadius: "8px" }}
+              onClick={sendPotentialUserRequest}
+              disabled={loading || !validateEmail(email)}
+            >
+              {loading ? "PLEASE WAIT" : "SEND"}
+            </Button>
+          </Box>
+        </Flex>
+      );
+    } else if (stateMachine.state === "complete") {
+      return (
+        <Flex flexWrap="wrap" verticalAlign={"center"} marginTop={2}>
+          <Box width={1} textAlign="center">
+            <Text>
+              We’ll write soon to{" "}
+              <Text display={"inline"} fontWeight={600}>
+                {email}
+              </Text>
+            </Text>
+          </Box>
+          <Box width={1} textAlign="center">
+            <img src={"/ok.svg"} />
+          </Box>
+        </Flex>
+      );
+    } else if (stateMachine.state === "failed") {
+      setTimeout(() => setStateMachine({ state: "idle" }), 1000);
+      return (
+        <Box width={1} textAlign="center">
+          <Text color="#FF473C">{error}</Text>
+        </Box>
+      );
+    }
+  };
   return (
     <>
       <Flex justifyContent={["center", "right", "right"]} mx={[2, 2, 4]} pt={2}>
@@ -84,38 +146,7 @@ const Home = () => {
                 <Heading fontSize={2} fontWeight={400} fontFamily={"Karla"}>
                   Subscribe here
                 </Heading>
-                <Flex verticalAlign={"center"} marginTop={2} flexWrap="wrap">
-                  <Box marginTop={2} width={[1, 1, 1 / 2]} marginRight={[0, 0, 3]}>
-                    <Label htmlFor="email" fontSize={1} mb={1}>
-                      Your Email
-                    </Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      placeholder="jhon@example.com"
-                      value={email}
-                      onChange={e => setEmail(e.target.value)}
-                      css={{ borderRadius: "8px", backgroundColor: "#F0F0F0", border: "none", padding: "8px" }}
-                    />
-                  </Box>
-                  <Box
-                    width={[1, 1, 1 / 3]}
-                    marginTop={[2, "auto", "auto"]}
-                    display={["flex", "block", "block"]}
-                    justifyContent="flex-end"
-                  >
-                    <Button
-                      py={2}
-                      backgroundColor={loading || !validateEmail(email) ? "#F0F0F0" : "#FFDE5F"}
-                      color={"#1B1B1B"}
-                      css={{ borderRadius: "8px" }}
-                      onClick={sendPotentialUserRequest}
-                      disabled={loading || !validateEmail(email)}
-                    >
-                      {loading ? "PLEASE WAIT" : "SEND"}
-                    </Button>
-                  </Box>
-                </Flex>
+                {renderState()}
               </Box>
             </Box>
           </Box>
