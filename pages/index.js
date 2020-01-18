@@ -1,10 +1,43 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { Box, Flex, Heading, Text, Button, Image } from "rebass";
 
 import { Label, Input } from "@rebass/forms";
+import { addNewPotentialUser } from "../api";
+import { ThreeBounce } from "styled-spinkit";
+
+const validateEmail = email => {
+  var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(String(email).toLowerCase());
+};
 
 const Home = () => {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [stateMachine, setStateMachine] = useState({ state: "idle" });
+  const [error, setError] = useState("");
+  const sendPotentialUserRequest = () => {
+    if (!validateEmail(email)) {
+      setError("Please, introduce a valid email");
+      return;
+    }
+
+    setLoading(true);
+    setStateMachine({ state: "loading" });
+    addNewPotentialUser({ email: email })
+      .then(r => {
+        console.log(r);
+        if (r.status === 200) {
+          console.log(r.data.email);
+          setStateMachine({ state: "complete" });
+        }
+      })
+      .catch(err => {
+        setStateMachine({ state: "failed" });
+      })
+      .finally(() => setLoading(false));
+  };
+
   return (
     <>
       <Flex justifyContent={["center", "right", "right"]} mx={[2, 2, 4]} pt={2}>
@@ -60,6 +93,8 @@ const Home = () => {
                       id="email"
                       name="email"
                       placeholder="jhon@example.com"
+                      value={email}
+                      onChange={e => setEmail(e.target.value)}
                       css={{ borderRadius: "8px", backgroundColor: "#F0F0F0", border: "none", padding: "8px" }}
                     />
                   </Box>
@@ -69,8 +104,15 @@ const Home = () => {
                     display={["flex", "block", "block"]}
                     justifyContent="flex-end"
                   >
-                    <Button py={2} backgroundColor={"#FFDE5F"} color={"#1B1B1B"} css={{ borderRadius: "8px" }}>
-                      SEND
+                    <Button
+                      py={2}
+                      backgroundColor={loading || !validateEmail(email) ? "#F0F0F0" : "#FFDE5F"}
+                      color={"#1B1B1B"}
+                      css={{ borderRadius: "8px" }}
+                      onClick={sendPotentialUserRequest}
+                      disabled={loading || !validateEmail(email)}
+                    >
+                      {loading ? "PLEASE WAIT" : "SEND"}
                     </Button>
                   </Box>
                 </Flex>
