@@ -4,7 +4,7 @@ import { Box, Flex, Heading, Text, Button, Image } from "rebass";
 
 import { Label, Input } from "@rebass/forms";
 import { addNewPotentialUser } from "../api";
-import { ThreeBounce } from "styled-spinkit";
+import { NextSeo } from "next-seo";
 
 const validateEmail = email => {
   var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -102,6 +102,11 @@ const Home = () => {
   };
   return (
     <>
+      <NextSeo
+        title="Minsky"
+        description="Minsky is a peruvian company with the goal of changing the way software is made"
+      />
+
       <Flex justifyContent={["center", "right", "right"]} mx={[2, 2, 4]} pt={2}>
         <Box>
           <img src={"/minskylogo.svg"} alt={"Minsky Logo"} />
