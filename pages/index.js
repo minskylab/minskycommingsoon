@@ -137,7 +137,7 @@ const Home = () => {
                 </Box>
               </Box>
               <Box my={2}>
-                <Text color={"#1B1B1B"}>A place where your ideas can be transform to more ideas</Text>
+                <Text color={"#1B1B1B"}>A place where your ideas can be improve another ideas</Text>
               </Box>
             </Box>
 
